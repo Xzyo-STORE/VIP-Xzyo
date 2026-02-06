@@ -3,108 +3,234 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XZYO STORE - LIVE</title>
+    <title>Xzyo Store - Joki BF</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
     <style>
-        body { background: #0b1220; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
-        .card { background: #111a33; padding: 20px; border-radius: 15px; margin: 10px auto; max-width: 500px; border: 1px solid #333; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        input { width: 90%; padding: 12px; margin: 8px; border-radius: 8px; border: 1px solid #222; background: #0b1220; color: white; outline: none; }
-        button { width: 95%; padding: 15px; background: linear-gradient(90deg, #0072ff, #00c6ff); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        button:hover { transform: scale(1.02); }
-        .item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #222; text-align: left; }
-        .sultan-name { font-size: 16px; margin-bottom: 2px; display: block; }
-        .badge-mahkota { color: gold; font-size: 18px; }
-        .badge-ceklis { color: #00ff88; font-size: 16px; margin-left: 5px; }
-        small { color: #aaa; }
+        :root {
+            --primary-blue: #0072ff;
+            --dark-bg: #0b1220;
+            --card-bg: #111a33;
+            --text-white: #ffffff;
+        }
+
+        * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        
+        body {
+            background: var(--dark-bg);
+            color: var(--text-white);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .wrapper { max-width: 1100px; width: 100%; }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            border: none;
+            margin-top: 15px;
+            background: linear-gradient(90deg, #020617, #0b3c8a, #020617);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+            display: block;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .left-side { flex: 1.5; min-width: 320px; }
+        .right-side { flex: 1; min-width: 320px; }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #1e293b;
+            margin-top: 10px;
+            background: #0b1220;
+            color: white;
+            outline: none;
+        }
+
+        .section-title {
+            margin-top: 20px;
+            font-weight: bold;
+            color: var(--primary-blue);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 5px;
+        }
+
+        .price-list { list-style: none; padding: 0; margin: 0; }
+        .price-list li {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 14px;
+        }
+
+        .new-p { color: #00c6ff; font-weight: 800; }
+
+        /* Style List VIP / Undian */
+        .vip-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: rgba(255,255,255,0.03);
+            margin-bottom: 8px;
+            border-radius: 10px;
+            border-left: 4px solid gold;
+        }
+
+        #order-slide { text-align: center; display: none; }
     </style>
 </head>
 <body>
-    <h2>👑 XZYO STORE LEADERBOARD 👑</h2>
 
-    <div id="adminBox" class="card" style="display:none;">
-        <h3>Input Data Admin</h3>
-        <input type="text" id="nama" placeholder="Nama Pelanggan">
-        <input type="number" id="wa" placeholder="Nomor WA (08...)">
-        <input type="number" id="nominal" placeholder="Nominal Joki (Rp)">
-        <button id="btnSimpan">UPDATE SEKARANG</button>
-    </div>
+<div class="wrapper">
+    <h2 style="text-align:center">JOKI BF XZYO STORE</h2>
+    
+    <div class="container">
+        <div class="left-side">
+            <div class="card" id="formCard">
+                <h3 style="margin-top:0"><i class="fa-solid fa-pen-to-square"></i> Formulir Joki</h3>
+                <form id="orderForm">
+                    <input type="text" id="namaPanggilan" placeholder="Nama Panggilan (Untuk List VIP)" required>
+                    <input type="text" id="usernameInput" placeholder="Username Roblox" required>
+                    <input type="password" id="pw" placeholder="Password Roblox" required>
+                    <input type="text" id="waInput" placeholder="Nomor WA Aktif" required>
+                    <textarea id="jenisJoki" placeholder="Contoh: Joki Level 1500 - MAX" rows="3" required></textarea>
+                    
+                    <button type="submit" class="btn">ORDER SEKARANG</button>
+                </form>
 
-    <div class="card">
-        <div id="listData">Menghubungkan ke database...</div>
+                <div id="order-slide">
+                    <h3 style="color: #00ff88;">ORDER TERKIRIM!</h3>
+                    <p>Data kamu sudah masuk ke List VIP di bawah lek.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 style="text-align:center; color: gold;"><i class="fa-solid fa-crown"></i> LIST VIP / UNDIAN XZYO</h3>
+                <div id="vipList">Memuat daftar sultan...</div>
+            </div>
+        </div>
+
+        <div class="right-side">
+            <div class="card">
+                <h3 style="text-align:center;">LIST JOKI DISKON</h3>
+                
+                <div class="section-title">Leveling</div>
+                <ul class="price-list">
+                    <li>1 – 700 <span class="new-p">12.7k</span></li>
+                    <li>700 – 1500 <span class="new-p">12.7k</span></li>
+                    <li>1500 – MAX <span class="new-p">17k</span></li>
+                </ul>
+
+                <div class="section-title">Belly & Fragment</div>
+                <ul class="price-list">
+                    <li>10M Belly <span class="new-p">17k</span></li>
+                    <li>20K Fragment <span class="new-p">12.7k</span></li>
+                </ul>
+                
+                <div class="section-title">Premium Boss</div>
+                <ul class="price-list">
+                    <li>God Human <span class="new-p">25.5k</span></li>
+                    <li>Soul Guitar <span class="new-p">12.7k</span></li>
+                </ul>
+
+                <button class="btn" style="margin-top:30px" onclick="window.open('https://wa.me/6289692310378')">HUBUNGI ADMIN</button>
+            </div>
+        </div>
     </div>
+</div>
 
 <script>
-    // Konfigurasi Firebase kamu tetap sama
+    // KONFIGURASI FIREBASE
     const firebaseConfig = {
         apiKey: "AIzaSyC6aUjN60bSDE0BLVs3V-yNRYfSsPv0ZV8",
         authDomain: "xzyostore-66448.firebaseapp.com",
-        databaseURL: "https://xzyostore-66448-default-rtdb.asia-southeast1.firebasedatabase.app",
+        databaseURL: "https://xzyostore-66448-default-rtdb.firebaseio.com",
         projectId: "xzyostore-66448",
-        storageBucket: "xzyostore-66448.firebasestorage.app",
-        messagingSenderId: "547146618223",
-        appId: "1:547146618223:web:978b0956cc0293cfb7449a",
-        measurementId: "G-EEJX0WXDKS"
+        appId: "1:547146618223:web:978b8956cc0293cfb7449a"
     };
-
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    if(window.location.search.includes('admin=true')) {
-        document.getElementById('adminBox').style.display = 'block';
-    }
+    // KIRIM DATA KE FIREBASE
+    document.getElementById('orderForm').onsubmit = function(e) {
+        e.preventDefault();
+        const nama = document.getElementById('namaPanggilan').value.trim();
+        const wa = document.getElementById('waInput').value;
 
-    document.getElementById('btnSimpan').onclick = function() {
-        const n = document.getElementById('nama').value.trim();
-        const w = document.getElementById('wa').value;
-        const p = parseInt(document.getElementById('nominal').value);
-        
-        if(!n || !p) return alert("Isi nama & nominal lek!");
-
-        db.ref('sultan/' + n).once('value').then((s) => {
-            const d = s.val() || { total: 0, count: 0 };
-            db.ref('sultan/' + n).update({
-                total: d.total + p,
-                count: d.count + 1,
-                whatsapp: w || d.whatsapp || "-"
+        // Simpan ke Firebase (Menambah jumlah joki secara otomatis)
+        const ref = db.ref('leaderboard/' + nama);
+        ref.once('value').then((snap) => {
+            const d = snap.val() || { kali: 0 };
+            ref.update({
+                kali: d.kali + 1,
+                whatsapp: wa,
+                lastOrder: new Date().toLocaleString()
             }).then(() => {
-                alert("Berhasil Update!");
-                document.getElementById('nama').value = "";
-                document.getElementById('wa').value = "";
-                document.getElementById('nominal').value = "";
+                document.getElementById('orderForm').style.display = 'none';
+                document.getElementById('order-slide').style.display = 'block';
+                setTimeout(() => { location.reload(); }, 2000);
             });
         });
     };
 
-    db.ref('sultan').on('value', (s) => {
-        const container = document.getElementById('listData');
-        const data = s.val();
-        if(!data) return container.innerHTML = "Belum ada data Sultan.";
+    // TAMPILKAN LIST VIP SECARA REALTIME
+    db.ref('leaderboard').on('value', (snap) => {
+        const listContainer = document.getElementById('vipList');
+        const data = snap.val();
         
-        container.innerHTML = "";
-        // Sorting berdasarkan Total Tertinggi
-        const sorted = Object.keys(data).sort((a,b) => data[b].total - data[a].total);
-        
-        sorted.forEach((name, i) => {
-            const u = data[name];
-            
-            // LOGIKA BADGE
-            let mahkota = u.count >= 5 ? '<span class="badge-mahkota"><i class="fa-solid fa-crown"></i></span>' : '';
-            let ceklis = u.total >= 100000 ? '<span class="badge-ceklis"><i class="fa-solid fa-circle-check"></i></span>' : '';
+        if(!data) {
+            listContainer.innerHTML = "Belum ada peserta.";
+            return;
+        }
 
-            container.innerHTML += `
-            <div class="item">
-                <span>
-                    <span class="sultan-name">${i+1}. <b>${name}</b> ${mahkota}${ceklis}</span>
-                    <small>WA: ${u.whatsapp}</small>
-                </span> 
-                <span style="text-align:right">
-                    <b style="color:#00ff88">Rp ${u.total.toLocaleString()}</b><br>
-                    <small>${u.count}x Joki</small>
-                </span>
-            </div>`;
+        listContainer.innerHTML = "";
+        // Urutkan berdasarkan siapa yang paling banyak joki
+        const sortedKeys = Object.keys(data).sort((a,b) => data[b].kali - data[a].kali);
+
+        sortedKeys.forEach((key, index) => {
+            const user = data[key];
+            const crown = user.kali >= 5 ? ' 👑' : '';
+            listContainer.innerHTML += `
+                <div class="vip-item">
+                    <span><b>${index + 1}. ${key}</b>${crown}</span>
+                    <span style="color: gold; font-weight: bold;">${user.kali}x Joki</span>
+                </div>
+            `;
         });
     });
 </script>
+
 </body>
 </html>
