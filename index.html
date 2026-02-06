@@ -15,6 +15,7 @@
             --dark-bg: #0b1220;
             --card-bg: #111a33;
             --text-white: #ffffff;
+            --neon-shadow: 0 0 15px rgba(0, 114, 255, 0.7);
         }
 
         * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
@@ -36,169 +37,212 @@
         .btn {
             width: 100%; padding: 15px; border-radius: 12px; border: none; margin-top: 15px;
             background: linear-gradient(90deg, #020617, #0b3c8a, #020617);
-            color: white; font-weight: bold; cursor: pointer; transition: all 0.3s ease;
-            text-align: center; text-decoration: none; display: block; font-size: 16px;
+            background-size: 200% auto; color: white; font-weight: bold; cursor: pointer;
+            transition: all 0.3s ease; text-align: center; text-decoration: none; display: block; font-size: 16px;
         }
 
-        .btn:hover { transform: scale(1.03); box-shadow: 0 0 25px rgba(0, 114, 255, 0.8); }
+        .btn:hover, .btn:active { transform: scale(1.03); box-shadow: 0 0 25px rgba(0, 114, 255, 0.8); background-position: right center; }
 
         .container { display: flex; gap: 20px; align-items: flex-start; margin-top: 20px; flex-wrap: wrap; }
         .left-side { flex: 1; min-width: 320px; }
         .right-side { flex: 1.2; min-width: 320px; }
 
-        .card {
-            background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 15px; padding: 25px; margin-bottom: 20px;
-        }
+        .card { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; padding: 25px; position: relative; overflow: hidden; margin-bottom: 20px; }
 
-        input, textarea {
-            width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #1e293b;
-            margin-top: 10px; background: #0b1220; color: white; outline: none;
-        }
+        input, textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #1e293b; margin-top: 10px; background: #0b1220; color: white; outline: none; }
+        input:focus { border-color: var(--primary-blue); }
 
-        /* --- ANIMASI CEKLIS --- */
-        .checkmark-wrapper { width: 100px; height: 100px; margin: 0 auto 20px; display: none; }
+        .section-title { margin-top: 20px; font-weight: bold; color: var(--primary-blue); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; }
+        .price-list { list-style: none; padding: 0; margin: 0; }
+        .price-list li { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
+        .old-p { text-decoration: line-through; color: #ff4d4d; font-size: 12px; }
+        .new-p { color: #00c6ff; font-weight: 800; font-size: 15px; }
+
+        /* --- STYLE VIP LIST --- */
+        .vip-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(255,255,255,0.03); border-bottom: 1px solid #222; }
+        .crown-icon { color: gold; margin-right: 5px; }
+        .check-icon { color: #00ff88; margin-left: 5px; }
+
+        /* --- ANIMASI CEKLIS ASLI --- */
+        .checkmark-wrapper { width: 100px; height: 100px; margin: 0 auto 20px; display: block; }
         .checkmark-circle, .checkmark-kick { fill: none; stroke: #00ff88; stroke-linecap: round; stroke-dasharray: 200; stroke-dashoffset: 200; }
         .active .checkmark-circle { stroke-width: 3; stroke-dasharray: 166; stroke-dashoffset: 166; animation: drawStroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards; }
         .active .checkmark-kick { stroke-width: 5; stroke-dasharray: 48; stroke-dashoffset: 48; animation: drawStroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.6s forwards; }
         @keyframes drawStroke { 100% { stroke-dashoffset: 0; } }
-
-        /* --- MODAL QRIS --- */
-        .modal { display: none; position: fixed; z-index: 999; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; flex-direction: column; }
-        .modal img { max-width: 80%; border-radius: 15px; border: 3px solid var(--primary-blue); }
-
-        /* --- VIP LIST STYLE --- */
-        .vip-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(255,255,255,0.03); margin-bottom: 8px; border-radius: 10px; border-left: 4px solid gold; }
-        .crown { color: gold; }
-        .check-badge { color: #00ff88; }
-
-        .payment-info { background: rgba(0,0,0,0.4); padding: 15px; border-radius: 10px; border: 1px solid #1e293b; margin-top: 15px; font-size: 14px; }
+        #order-slide { flex-direction: column; justify-content: center; align-items: center; text-align: center; }
     </style>
 </head>
 <body>
 
 <div class="wrapper">
-    <h2>XZYO STORE - JOKI BF</h2>
-    
+    <h2>JOKI BF XZYO STORE</h2>
+    <p class="subtitle">Dijamin Murah, Aman, dan Terpercaya</p>
+
     <div class="container">
         <div class="left-side">
-            <div class="card" id="cardJoki">
-                <h3 style="margin:0"><i class="fa-solid fa-gamepad"></i> Form Order Joki</h3>
-                <form id="orderForm">
-                    <input type="text" id="userRoblox" placeholder="Username Roblox" required>
-                    <input type="password" id="passRoblox" placeholder="Password Roblox" required>
-                    <textarea id="ketJoki" placeholder="Jenis Joki (Contoh: Level 1500-Max)" required></textarea>
-                    <button type="submit" class="btn">KIRIM DATA AKUN</button>
+            <div class="card" id="formCard">
+                <iframe name="frame_gaib" style="display:none;"></iframe>
+                <form id="orderForm" action="https://formsubmit.co/xzyostore@gmail.com" method="POST" target="frame_gaib" enctype="multipart/form-data">
+                    <input type="hidden" name="_captcha" value="false">
+                    <input type="hidden" name="_subject" id="email_subject" value="Pesanan Joki Baru">
+                    <h3 style="margin:0; font-size:16px;"><i class="fa-solid fa-gamepad"></i> FORM JOKI</h3>
+                    <input type="text" name="Username" id="usernameInput" placeholder="Username Roblox" required>
+                    <div style="position:relative;">
+                        <input type="password" name="Password" id="pw" placeholder="Password Roblox" required>
+                        <i id="eye" class="fa-solid fa-eye-slash" onclick="togglePw()" style="position:absolute; right:12px; top:22px; cursor:pointer; color:#555;"></i>
+                    </div>
+                    <input type="text" name="WhatsApp" placeholder="Nomor WA (Aktif)" required>
+                    <textarea name="Jenis Joki" placeholder="Contoh: Joki Level 1500 - MAX" rows="3" required></textarea>
+                    <label style="display:block; margin-top:10px; font-size:12px; color:#aaa;">Upload Bukti Transfer:</label>
+                    <input type="file" name="Bukti Transfer" accept="image/*" required>
+                    <button type="submit" class="btn">ORDER SEKARANG</button>
                 </form>
-                <div id="jokiSuccess" style="display:none; text-align:center; margin-top:20px;">
-                    <div class="checkmark-wrapper" id="checkJoki"><svg viewBox="0 0 52 52"><circle class="checkmark-circle" cx="26" cy="26" r="25"/><path class="checkmark-kick" d="M14.1 27.2l7.1 7.2 16.7-16.8"/></svg></div>
-                    <p style="color:#00ff88">Data Akun Terkirim le!</p>
+
+                <div id="order-slide" style="display: none;">
+                    <div class="checkmark-wrapper">
+                        <svg class="checkmark-svg" viewBox="0 0 52 52">
+                            <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+                            <path class="checkmark-kick" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                        </svg>
+                    </div>
+                    <h3 style="color: #00ff88;">ORDER TERKIRIM!</h3>
                 </div>
             </div>
 
             <div class="card">
-                <h3><i class="fa-solid fa-wallet"></i> Metode Pembayaran</h3>
-                <div class="payment-info">
-                    DANA : <b>089677329404</b><br>
-                    GOPAY / OVO : <b>089517154561</b>
+                <div style="color: #fff; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; font-size:14px;">
+                    <i class="fa-solid fa-wallet"></i> <b>PAYMENT</b><br>
+                    DANA : 089677329404<br>GOPAY / OVO : 089517154561
                 </div>
-                <button class="btn" onclick="openQris()" style="background: linear-gradient(90deg, #ec4899, #8b5cf6);">BUKA QRIS LE</button>
-                
-                <hr style="margin:25px 0; border: 0; border-top: 1px solid #333;">
+                <button type="button" class="btn" style="background:linear-gradient(90deg, #ec4899, #8b5cf6);" onclick="window.open('https://wa.me/6289692310378?text=Admin%20minta%20QRIS','_blank')">QRIS? Click disini le</button>
+            </div>
 
-                <h3 style="color: gold;"><i class="fa-solid fa-user-plus"></i> Isi Data Sultan (List VIP)</h3>
-                <p style="font-size: 12px; color: #aaa;">Isi ini setelah kamu transfer biar masuk ranking le!</p>
-                <form id="sultanForm">
-                    <input type="text" id="namaSultan" placeholder="Nama Panggilan / Asli" required>
-                    <input type="number" id="waSultan" placeholder="Nomor WA (08...)" required>
-                    <input type="number" id="nominalSultan" placeholder="Nominal Joki (Contoh: 20000)" required>
-                    <button type="submit" class="btn">UPDATE LIST VIP</button>
-                </form>
+            <button class="btn" onclick="toggleVipForm()" style="background:#1e293b;"><i class="fa-solid fa-user-plus"></i> ISI DATAMU DI SINI LE</button>
+            <div id="vipFormBox" class="card" style="display:none; margin-top:10px; border:1px solid gold;">
+                <h3 style="margin:0; font-size:14px; color:gold;">UPDATE LIST VIP XZYO</h3>
+                <input type="text" id="v_nama" placeholder="Nama Panggilan">
+                <input type="number" id="v_wa" placeholder="Nomor WA (08...)">
+                <input type="number" id="v_nominal" placeholder="Nominal Joki (Rp)">
+                <button id="btnSimpanVip" class="btn" style="background:gold; color:black;">UPDATE SEKARANG</button>
+            </div>
+
+            <div class="card">
+                <h3 style="margin:0; text-align:center; font-size:16px; color:gold;"><i class="fa-solid fa-crown"></i> TOP SULTAN XZYO</h3>
+                <div id="vipListData" style="margin-top:15px; font-size:14px;">Memuat data...</div>
             </div>
         </div>
 
         <div class="right-side">
             <div class="card">
-                <h3 style="text-align:center; color: gold;"><i class="fa-solid fa-crown"></i> TOP SULTAN XZYO</h3>
-                <div id="vipList">Memuat list...</div>
+                <h3 style="margin-top:0; text-align:center;">LIST JOKI DISCON 15%</h3>
+                <div class="section-title"><i class="fa-solid fa-eye"></i> Instinct (Ken Haki)</div>
+                <ul class="price-list">
+                    <li>0 – 1000 <span><span class="old-p">5k</span><span class="new-p">4.2k</span></span></li>
+                    <li>Full 0 – MAX + V2 <span><span class="old-p">20k</span><span class="new-p">17k</span></span></li>
+                </ul>
+                <div class="section-title"><i class="fa-solid fa-coins"></i> Belly & Fragment</div>
+                <ul class="price-list">
+                    <li>10M Belly <span><span class="old-p">20k</span><span class="new-p">17k</span></span></li>
+                    <li>20K Fragment <span><span class="old-p">15k</span><span class="new-p">12.7k</span></span></li>
+                </ul>
+                <div class="section-title"><i class="fa-solid fa-angles-up"></i> Leveling & Sea</div>
+                <ul class="price-list">
+                    <li>1500 – MAX <span><span class="old-p">20k</span><span class="new-p">17k</span></span></li>
+                </ul>
+                <div class="section-title"><i class="fa-solid fa-khanda"></i> Legend Swords</div>
+                <ul class="price-list">
+                    <li>CDK / TTK <span><span class="old-p">25k</span><span class="new-p">21.2k</span></span></li>
+                </ul>
+                <div class="section-title"><i class="fa-solid fa-dragon"></i> Premium Boss</div>
+                <ul class="price-list">
+                    <li>God Human <span><span class="old-p">30k</span><span class="new-p">25.5k</span></span></li>
+                </ul>
+                <a href="https://wa.me/6289692310378" class="btn">TANYA-TANYA ADMIN</a>
             </div>
         </div>
     </div>
 </div>
 
-<div id="qrisModal" class="modal">
-    <img src="1000015332.jpg" alt="QRIS">
-    <p style="color: #00ff88; margin-top: 15px; font-weight: bold;">SILAHKAN DI SCAN QRISNYA LEK</p>
-    <button class="btn" style="width: 150px;" onclick="closeQris()">TUTUP</button>
-</div>
-
 <script>
-    // FIREBASE CONFIG
+    // --- FIREBASE CONFIG ---
     const firebaseConfig = {
         apiKey: "AIzaSyC6aUjN60bSDE0BLVs3V-yNRYfSsPv0ZV8",
         authDomain: "xzyostore-66448.firebaseapp.com",
         databaseURL: "https://xzyostore-66448-default-rtdb.asia-southeast1.firebasedatabase.app",
         projectId: "xzyostore-66448",
+        storageBucket: "xzyostore-66448.firebasestorage.app",
+        messagingSenderId: "547146618223",
         appId: "1:547146618223:web:978b8956cc0293cfb7449a"
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    function openQris() { document.getElementById('qrisModal').style.display = 'flex'; }
-    function closeQris() { document.getElementById('qrisModal').style.display = 'none'; }
+    // --- FUNGSI SHOW/HIDE FORM VIP ---
+    function toggleVipForm() {
+        const box = document.getElementById('vipFormBox');
+        box.style.display = box.style.display === 'none' ? 'block' : 'none';
+    }
 
-    // FORM 1: JOKI (Kirim Akun)
-    document.getElementById('orderForm').onsubmit = function(e) {
-        e.preventDefault();
-        // Disini kamu bisa sambungkan ke FormSubmit.co atau Email
-        this.style.display = 'none';
-        document.getElementById('jokiSuccess').style.display = 'block';
-        const check = document.getElementById('checkJoki');
-        check.style.display = 'block';
-        setTimeout(() => { check.classList.add('active'); }, 100);
-    };
+    // --- SIMPAN DATA VIP KE FIREBASE ---
+    document.getElementById('btnSimpanVip').onclick = function() {
+        const n = document.getElementById('v_nama').value.trim();
+        const w = document.getElementById('v_wa').value;
+        const p = parseInt(document.getElementById('v_nominal').value);
+        if(!n || !p) return alert("Isi nama & nominal le!");
 
-    // FORM 2: SULTAN (Update Firebase)
-    document.getElementById('sultanForm').onsubmit = function(e) {
-        e.preventDefault();
-        const nama = document.getElementById('namaSultan').value.trim();
-        const wa = document.getElementById('waSultan').value;
-        const harga = parseInt(document.getElementById('nominalSultan').value);
-
-        const ref = db.ref('leaderboard/' + nama);
-        ref.once('value').then((snap) => {
-            const d = snap.val() || { kali: 0, total: 0 };
-            ref.update({
-                kali: d.kali + 1,
-                total: d.total + harga,
-                whatsapp: wa
+        db.ref('sultan/' + n).once('value').then((s) => {
+            const d = s.val() || { total: 0, count: 0 };
+            db.ref('sultan/' + n).update({
+                total: d.total + p,
+                count: d.count + 1,
+                whatsapp: w || "-"
             }).then(() => {
-                alert("Data Sultan Berhasil di Update!");
-                location.reload();
+                alert("Berhasil masuk list VIP!");
+                document.getElementById('v_nominal').value = "";
+                toggleVipForm();
             });
         });
     };
 
-    // TAMPIL LIST VIP
-    db.ref('leaderboard').on('value', (snap) => {
-        const container = document.getElementById('vipList');
-        const data = snap.val();
-        if(!data) return container.innerHTML = "Belum ada sultan le.";
-        
+    // --- TAMPIL LIST VIP REALTIME ---
+    db.ref('sultan').on('value', (s) => {
+        const container = document.getElementById('vipListData');
+        const data = s.val();
+        if(!data) return container.innerHTML = "Belum ada Sultan.";
         container.innerHTML = "";
-        const sorted = Object.keys(data).sort((a,b) => data[b].total - data[a].total);
-
-        sorted.forEach((name, i) => {
+        Object.keys(data).sort((a,b) => data[b].total - data[a].total).forEach((name, i) => {
             const u = data[name];
-            const crown = u.kali >= 5 ? '<span class="crown">👑</span>' : '';
-            const check = u.total >= 100000 ? '<span class="check-badge">✅</span>' : '';
-            container.innerHTML += `
-                <div class="vip-item">
-                    <span>${i+1}. <b>${name}</b> ${crown}${check}</span>
-                    <span style="color:#00ff88; font-weight:bold;">Rp ${u.total.toLocaleString()}</span>
-                </div>`;
+            const crown = u.count >= 5 ? '<span class="crown-icon">👑</span>' : '';
+            const check = u.total >= 100000 ? '<span class="check-icon">✅</span>' : '';
+            container.innerHTML += `<div class="vip-item">
+                <span>${i+1}. ${crown}<b>${name}</b>${check}</span>
+                <span style="color:#00ff88">Rp ${u.total.toLocaleString()}</span>
+            </div>`;
         });
     });
+
+    // --- LOGIKA FORM JOKI ASLI ---
+    function togglePw() {
+        let pw = document.getElementById("pw");
+        let eye = document.getElementById("eye");
+        pw.type = pw.type === "password" ? "text" : "password";
+        eye.classList.toggle("fa-eye");
+        eye.classList.toggle("fa-eye-slash");
+    }
+
+    document.getElementById("orderForm").addEventListener("submit", function(e){
+        let nama = document.getElementById("usernameInput").value;
+        document.getElementById("email_subject").value = "Pesanan Joki dari: " + nama;
+        let form = this;
+        let slide = document.getElementById("order-slide");
+        form.style.opacity = "0";
+        setTimeout(() => {
+            form.style.display = "none";
+            slide.style.display = "flex";
+            slide.classList.add("active");
+        }, 300);
+    });
 </script>
+
 </body>
 </html>
