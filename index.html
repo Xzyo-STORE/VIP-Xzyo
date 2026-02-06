@@ -1,21 +1,17 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
+   <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Xzyo Store - Joki Blox Fruit</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
     <style>
         :root {
             --primary-blue: #0072ff;
             --dark-bg: #0b1220;
             --card-bg: #111a33;
             --text-white: #ffffff;
-            --gold: #ffd700;
+            --neon-shadow: 0 0 15px rgba(0, 114, 255, 0.7);
         }
 
         * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
@@ -30,28 +26,100 @@
             align-items: center;
         }
 
-        .wrapper { max-width: 1000px; width: 100%; }
+        .wrapper {
+            max-width: 1000px;
+            width: 100%;
+        }
+
         h2 { text-align: center; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 2px; }
         p.subtitle { text-align: center; color: #7cc7ff; margin-bottom: 20px; }
 
         .btn {
-            width: 100%; padding: 15px; border-radius: 12px; border: none; margin-top: 15px;
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            border: none;
+            margin-top: 15px;
             background: linear-gradient(90deg, #020617, #0b3c8a, #020617);
-            background-size: 200% auto; color: white; font-weight: bold; cursor: pointer;
-            transition: all 0.3s ease; text-align: center; text-decoration: none; display: block; font-size: 16px;
+            background-size: 200% auto;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+            display: block;
+            font-size: 16px;
         }
 
-        .btn:hover { transform: scale(1.03); box-shadow: 0 0 25px rgba(0, 114, 255, 0.8); }
+        .btn:hover, .btn:active {
+            transform: scale(1.03);
+            box-shadow: 0 0 25px rgba(0, 114, 255, 0.8);
+            background-position: right center;
+        }
 
-        .container { display: flex; gap: 20px; align-items: flex-start; margin-top: 20px; flex-wrap: wrap; }
-        .left-side { flex: 1; min-width: 320px; }
-        .right-side { flex: 1.2; min-width: 320px; }
+        .container {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            margin-top: 20px;
+        }
 
-        .card { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; padding: 25px; position: relative; overflow: hidden; margin-bottom: 20px; }
+        .left-side {
+            flex: 1;
+            position: sticky;
+            top: 20px;
+            min-width: 320px;
+        }
 
-        input, textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #1e293b; margin-top: 10px; background: #0b1220; color: white; outline: none; }
+        .right-side {
+            flex: 1.2;
+            min-width: 320px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #1e293b;
+            margin-top: 10px;
+            background: #0b1220;
+            color: white;
+            outline: none;
+        }
+
         input:focus { border-color: var(--primary-blue); }
 
+        .section-title {
+            margin-top: 20px;
+            font-weight: bold;
+            color: var(--primary-blue);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 5px;
+        }
+
+        .price-list { list-style: none; padding: 0; margin: 0; }
+        .price-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 14px;
+        }
+
+        .old-p { text-decoration: line-through; color: #ff4d4d; font-size: 12px; }
+        .new-p { color: #00c6ff; font-weight: 800; font-size: 15px; }
         /* --- VIP LIST STYLE MEWAH --- */
         .vip-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(255,255,255,0.03); border-bottom: 1px solid #222; }
         .crown-mewah { color: var(--gold); text-shadow: 0 0 10px gold; font-size: 18px; }
@@ -75,8 +143,12 @@
 
 <div class="wrapper">
     <h2>XZYO STORE</h2>
-    <p class="subtitle">Satu Form, Simple, dan Mewah</p>
-
+    <p class="subtitle">DIJAMIN AMAN MURAH DAN TERPERCAYA</p>
+    
+   <button type="button" class="btn" onclick="window.open('https://whatsapp.com/channel/0029VbCFZEm5kg7DZoIDgG3r','_blank')">
+        <i class="fa-brands fa-whatsapp"></i> TESTIMONI? CEK DI SINI LEKKU
+    </button>
+    
     <div class="container">
         <div class="left-side">
             <div class="card" id="formCard">
@@ -98,9 +170,6 @@
                     <textarea name="Jenis Joki" placeholder="Contoh: Joki Level 1500 - MAX" rows="2" required></textarea>
                     
                     <input type="number" name="Nominal Joki" id="nominalInput" placeholder="Nominal Joki (Contoh: 20000)" required>
-                    
-                    <label style="display:block; margin-top:10px; font-size:12px; color:#aaa;">Upload Bukti Transfer:</label>
-                    <input type="file" name="Bukti Transfer" accept="image/*" required>
                     
                     <button type="submit" class="btn">ORDER & MASUK LIST VIP</button>
                 </form>
