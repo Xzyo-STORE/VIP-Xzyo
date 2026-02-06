@@ -8,10 +8,15 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
         body { background: #0b1220; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
-        .card { background: #111a33; padding: 20px; border-radius: 15px; margin: 10px auto; max-width: 500px; border: 1px solid #333; }
-        input { width: 90%; padding: 12px; margin: 8px; border-radius: 8px; border: none; }
-        button { width: 95%; padding: 15px; background: #0072ff; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; }
-        .item { display: flex; justify-content: space-between; padding: 15px; border-bottom: 1px solid #222; text-align: left; }
+        .card { background: #111a33; padding: 20px; border-radius: 15px; margin: 10px auto; max-width: 500px; border: 1px solid #333; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        input { width: 90%; padding: 12px; margin: 8px; border-radius: 8px; border: 1px solid #222; background: #0b1220; color: white; outline: none; }
+        button { width: 95%; padding: 15px; background: linear-gradient(90deg, #0072ff, #00c6ff); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        button:hover { transform: scale(1.02); }
+        .item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #222; text-align: left; }
+        .sultan-name { font-size: 16px; margin-bottom: 2px; display: block; }
+        .badge-mahkota { color: gold; font-size: 18px; }
+        .badge-ceklis { color: #00ff88; font-size: 16px; margin-left: 5px; }
+        small { color: #aaa; }
     </style>
 </head>
 <body>
@@ -30,16 +35,17 @@
     </div>
 
 <script>
+    // Konfigurasi Firebase kamu tetap sama
     const firebaseConfig = {
-  apiKey: "AIzaSyC6aUjN60bSDE0BLVs3V-yNRYfSsPv0ZV8",
-  authDomain: "xzyostore-66448.firebaseapp.com",
-  databaseURL: "https://xzyostore-66448-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "xzyostore-66448",
-  storageBucket: "xzyostore-66448.firebasestorage.app",
-  messagingSenderId: "547146618223",
-  appId: "1:547146618223:web:978b0956cc0293cfb7449a",
-  measurementId: "G-EEJX0WXDKS"
-};
+        apiKey: "AIzaSyC6aUjN60bSDE0BLVs3V-yNRYfSsPv0ZV8",
+        authDomain: "xzyostore-66448.firebaseapp.com",
+        databaseURL: "https://xzyostore-66448-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "xzyostore-66448",
+        storageBucket: "xzyostore-66448.firebasestorage.app",
+        messagingSenderId: "547146618223",
+        appId: "1:547146618223:web:978b0956cc0293cfb7449a",
+        measurementId: "G-EEJX0WXDKS"
+    };
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
@@ -63,6 +69,8 @@
                 whatsapp: w || d.whatsapp || "-"
             }).then(() => {
                 alert("Berhasil Update!");
+                document.getElementById('nama').value = "";
+                document.getElementById('wa').value = "";
                 document.getElementById('nominal').value = "";
             });
         });
@@ -74,11 +82,26 @@
         if(!data) return container.innerHTML = "Belum ada data Sultan.";
         
         container.innerHTML = "";
-        Object.keys(data).sort((a,b) => data[b].total - data[a].total).forEach((name, i) => {
+        // Sorting berdasarkan Total Tertinggi
+        const sorted = Object.keys(data).sort((a,b) => data[b].total - data[a].total);
+        
+        sorted.forEach((name, i) => {
             const u = data[name];
-            container.innerHTML += `<div class="item">
-                <span>${i+1}. <b>${name}</b><br><small>WA: ${u.whatsapp}</small></span> 
-                <span style="color:#00ff88">Rp ${u.total.toLocaleString()}<br><small style="color:white">${u.count}x</small></span>
+            
+            // LOGIKA BADGE
+            let mahkota = u.count >= 5 ? '<span class="badge-mahkota">👑</span>' : '';
+            let ceklis = u.total >= 100000 ? '<span class="badge-ceklis">✅</span>' : '';
+
+            container.innerHTML += `
+            <div class="item">
+                <span>
+                    <span class="sultan-name">${i+1}. <b>${name}</b> ${mahkota}${ceklis}</span>
+                    <small>WA: ${u.whatsapp}</small>
+                </span> 
+                <span style="text-align:right">
+                    <b style="color:#00ff88">Rp ${u.total.toLocaleString()}</b><br>
+                    <small>${u.count}x Joki</small>
+                </span>
             </div>`;
         });
     });
