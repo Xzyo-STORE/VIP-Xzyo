@@ -275,27 +275,37 @@
 </div>
 
 <script>
-    // --- FIREBASE CONFIG ---
-  const firebaseConfig = {
-  apiKey: "AIzaSyC6aUjN60bSDE0BLVs3V-yNRYfSsPv0ZV8",
-  authDomain: "xzyostore-66448.firebaseapp.com",
-  databaseURL: "https://xzyostore-66448-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "xzyostore-66448",
-  storageBucket: "xzyostore-66448.firebasestorage.app",
-  messagingSenderId: "547146618223",
-  appId: "1:547146618223:web:978b0956cc0293cfb7449a",
-  measurementId: "G-EEJX0WXDKS"
-};
-   
-    firebase.initializeApp(firebaseConfig);
+  // --- FIREBASE CONFIG ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyC6aUjN60bSDE0BLVs3V-yNRYfSsPv0ZV8",
+        authDomain: "xzyostore-66448.firebaseapp.com",
+        databaseURL: "https://xzyostore-66448-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "xzyostore-66448",
+        appId: "1:547146618223:web:978b8956cc0293cfb7449a"
+    };
+    
+    // Inisialisasi Firebase
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
     const db = firebase.database();
 
     let allUsers = {};
 
-    // Ambil data awal untuk Auto-fill
-    db.ref('sultan').on('value', (s) => {
-        allUsers = s.val() || {};
-        updateLeaderboard(allUsers);
+    // Ambil data awal untuk Auto-fill & Leaderboard
+    // Gunakan .on('value') agar otomatis update kalau ada data masuk
+    db.ref('sultan').on('value', (snapshot) => {
+        const data = snapshot.val();
+        console.log("Data diterima:", data); // Cek di inspect console
+        if (data) {
+            allUsers = data;
+            updateLeaderboard(data);
+        } else {
+            document.getElementById('vipListData').innerHTML = "Belum ada sultan le.";
+        }
+    }, (error) => {
+        console.error("Error Firebase:", error);
+        document.getElementById('vipListData').innerHTML = "Gagal memuat: " + error.message;
     });
 
     // FUNGSI AUTO FILL WA
@@ -304,27 +314,14 @@
             document.getElementById('waInput').value = allUsers[name].whatsapp;
         }
     }
-   
-   function bukaQris() {
-    // ID File dari link Google Drive-mu lek
-    const driveId = "1emJk_GFVcRN6Dd0Mnha_MrNyGHxL8QLt";
-    
-    // Link khusus biar gambar Drive bisa muncul langsung (Direct Link)
-    const directLink = `https://lh3.googleusercontent.com/d/${driveId}`;
-    
-    document.getElementById('qrisImg').src = directLink;
-    document.getElementById('qrisModal').style.display = 'flex';
-}
-
-function tutupQris() {
-    document.getElementById('qrisModal').style.display = 'none';
-}
 
     // FORM SUBMIT HANDLER
     document.getElementById("orderForm").addEventListener("submit", function(e){
-        const user = document.getElementById("usernameInput").value;
-        const wa = document.getElementById("waInput").value;
+        const user = document.getElementById("usernameInput").value.trim();
+        const wa = document.getElementById("waInput").value.trim();
         const nominal = parseInt(document.getElementById("nominalInput").value);
+
+        if(!user || !nominal) return;
 
         // 1. UPDATE FIREBASE (Leaderboard)
         const ref = db.ref('sultan/' + user);
@@ -334,10 +331,12 @@ function tutupQris() {
                 total: d.total + nominal,
                 count: d.count + 1,
                 whatsapp: wa
+            }).then(() => {
+                console.log("Firebase Updated!");
             });
         });
 
-        // 2. ANIMASI ASLI KAMU
+        // 2. ANIMASI ASLI
         let form = this;
         let slide = document.getElementById("order-slide");
         form.style.opacity = "0";
@@ -346,27 +345,26 @@ function tutupQris() {
             slide.style.display = "flex";
             slide.classList.add("active");
         }, 300);
-        
-        // FormSubmit akan jalan otomatis lewat target frame_gaib
     });
 
     // UPDATE LEADERBOARD MEWAH
     function updateLeaderboard(data) {
         const container = document.getElementById('vipListData');
         container.innerHTML = "";
+        
+        // Sorting Sultan dari yang paling banyak totalnya
         const sorted = Object.keys(data).sort((a,b) => data[b].total - data[a].total);
 
         sorted.forEach((name, i) => {
             const u = data[name];
-            // Mahkota Mewah (Joki >= 5)
             const crown = u.count >= 5 ? '<i class="fa-solid fa-crown crown-mewah"></i>' : '';
-            // Ceklis Mewah (Total >= 100k)
             const check = u.total >= 100000 ? '<i class="fa-solid fa-circle-check check-mewah"></i>' : '';
             
-            container.innerHTML += `<div class="vip-item">
-                <span>${i+1}. ${crown} <b>${name}</b> ${check}</span>
-                <span style="color:#00ff88; font-weight:bold;">Rp ${u.total.toLocaleString()}</span>
-            </div>`;
+            container.innerHTML += `
+                <div class="vip-item">
+                    <span>${i+1}. ${crown} <b>${name}</b> ${check}</span>
+                    <span style="color:#00ff88; font-weight:bold;">Rp ${u.total.toLocaleString()}</span>
+                </div>`;
         });
     }
 
