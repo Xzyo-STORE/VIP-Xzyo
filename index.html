@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-   <meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Xzyo Store - Joki Blox Fruit</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
     <style>
         :root {
             --primary-blue: #0072ff;
             --dark-bg: #0b1220;
             --card-bg: #111a33;
             --text-white: #ffffff;
-            --neon-shadow: 0 0 15px rgba(0, 114, 255, 0.7);
         }
 
         * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
@@ -22,260 +25,112 @@
             margin: 0;
             padding: 20px;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
+            min-height: 100vh;
         }
 
-        .wrapper {
-            max-width: 1000px;
+        .card { 
+            background: var(--card-bg); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 20px; 
+            padding: 30px; 
+            max-width: 450px; 
             width: 100%;
-        }
-
-        h2 { text-align: center; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 2px; }
-        p.subtitle { text-align: center; color: #7cc7ff; margin-bottom: 20px; }
-
-        .btn {
-            width: 100%;
-            padding: 15px;
-            border-radius: 12px;
-            border: none;
-            margin-top: 15px;
-            background: linear-gradient(90deg, #020617, #0b3c8a, #020617);
-            background-size: 200% auto;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-            text-decoration: none;
-            display: block;
-            font-size: 16px;
-        }
-
-        .btn:hover, .btn:active {
-            transform: scale(1.03);
-            box-shadow: 0 0 25px rgba(0, 114, 255, 0.8);
-            background-position: right center;
-        }
-
-        .container {
-            display: flex;
-            gap: 20px;
-            align-items: flex-start;
-            margin-top: 20px;
-        }
-
-        .left-side {
-            flex: 1;
-            position: sticky;
-            top: 20px;
-            min-width: 320px;
-        }
-
-        .right-side {
-            flex: 1.2;
-            min-width: 320px;
-        }
-
-        .card {
-            background: var(--card-bg);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 15px;
-            padding: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
             position: relative;
-            overflow: hidden;
-            margin-bottom: 20px;
         }
 
-        input, textarea {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #1e293b;
-            margin-top: 10px;
-            background: #0b1220;
-            color: white;
-            outline: none;
-        }
+        h2 { text-align: center; margin: 0; color: var(--primary-blue); letter-spacing: 2px; text-transform: uppercase; }
+        p.subtitle { text-align: center; font-size: 13px; color: #7cc7ff; margin-bottom: 25px; }
 
+        input, textarea { 
+            width: 100%; padding: 14px; border-radius: 10px; border: 1px solid #1e293b; 
+            margin-top: 12px; background: #0b1220; color: white; outline: none; transition: 0.3s;
+        }
         input:focus { border-color: var(--primary-blue); }
 
-        .section-title {
-            margin-top: 20px;
-            font-weight: bold;
-            color: var(--primary-blue);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding-bottom: 5px;
+        .btn {
+            width: 100%; padding: 15px; border-radius: 12px; border: none; margin-top: 20px;
+            background: linear-gradient(90deg, #020617, #0b3c8a, #020617);
+            color: white; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 16px;
         }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,114,255,0.4); }
 
-        .price-list { list-style: none; padding: 0; margin: 0; }
-        .price-list li {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            font-size: 14px;
+        /* MODAL QRIS */
+        #qrisModal { 
+            display:none; position:fixed; z-index:100; top:0; left:0; width:100%; height:100%; 
+            background:rgba(0,0,0,0.9); justify-content:center; align-items:center; flex-direction:column; 
         }
+        #qrisModal img { max-width: 85%; border-radius: 15px; border: 2px solid var(--primary-blue); }
 
-        .old-p { text-decoration: line-through; color: #ff4d4d; font-size: 12px; }
-        .new-p { color: #00c6ff; font-weight: 800; font-size: 15px; }
-        /* --- VIP LIST STYLE MEWAH --- */
-        .vip-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(255,255,255,0.03); border-bottom: 1px solid #222; }
-        .crown-mewah { color: var(--gold); text-shadow: 0 0 10px gold; font-size: 18px; }
-        .check-mewah { color: #00ff88; text-shadow: 0 0 10px #00ff88; font-size: 16px; margin-left: 5px; }
-
-        /* --- ANIMASI ASLI KAMU --- */
-        .checkmark-wrapper { width: 100px; height: 100px; margin: 0 auto 20px; display: block; }
+        /* ANIMASI CEKLIS ASLI */
+        .checkmark-wrapper { width: 100px; height: 100px; margin: 0 auto 20px; display: none; }
         .checkmark-circle, .checkmark-kick { fill: none; stroke: #00ff88; stroke-linecap: round; stroke-dasharray: 200; stroke-dashoffset: 200; }
-        .active .checkmark-circle { stroke-width: 3; stroke-dasharray: 166; stroke-dashoffset: 166; animation: drawStroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards; }
-        .active .checkmark-kick { stroke-width: 5; stroke-dasharray: 48; stroke-dashoffset: 48; animation: drawStroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.6s forwards; }
+        .active .checkmark-circle { stroke-width: 3; stroke-dasharray: 166; stroke-dashoffset: 166; animation: drawStroke 0.6s forwards; }
+        .active .checkmark-kick { stroke-width: 5; stroke-dasharray: 48; stroke-dashoffset: 48; animation: drawStroke 0.3s 0.6s forwards; }
         @keyframes drawStroke { 100% { stroke-dashoffset: 0; } }
-        #order-slide { flex-direction: column; justify-content: center; align-items: center; text-align: center; }
 
-        .section-title { margin-top: 20px; font-weight: bold; color: var(--primary-blue); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; }
-        .price-list { list-style: none; padding: 0; margin: 0; }
-        .price-list li { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
-        .new-p { color: #00c6ff; font-weight: 800; }
+        .payment-info {
+            background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; margin-top: 20px;
+            font-size: 13px; text-align: center; border: 1px dashed #1e293b;
+        }
     </style>
 </head>
 <body>
 
-<div class="wrapper">
-    <h2>XZYO STORE</h2>
-    <p class="subtitle">DIJAMIN AMAN MURAH DAN TERPERCAYA</p>
+<div class="card">
+    <h2>XZYO JOKI</h2>
+    <p class="subtitle">Isi data akunmu dengan aman le!</p>
+
+    <iframe name="gaib_frame" style="display:none;"></iframe>
     
-   <button type="button" class="btn" onclick="window.open('https://whatsapp.com/channel/0029VbCFZEm5kg7DZoIDgG3r','_blank')">
-        <i class="fa-brands fa-whatsapp"></i> TESTIMONI? CEK DI SINI LEKKU
-    </button>
-    
-    <div class="container">
-        <div class="left-side">
-            <div class="card" id="formCard">
-                <iframe name="frame_gaib" style="display:none;"></iframe>
-                <form id="orderForm" action="https://formsubmit.co/xzyostore@gmail.com" method="POST" target="frame_gaib" enctype="multipart/form-data">
-                    <input type="hidden" name="_captcha" value="false">
-                    <input type="hidden" name="_subject" id="email_subject" value="Pesanan Joki & Update VIP">
-                    
-                    <h3 style="margin:0; font-size:16px; color:var(--primary-blue);"><i class="fa-solid fa-gamepad"></i> FORM JOKI</h3>
-                    
-                    <input type="text" name="Usename" id="usernameInput" placeholder="Username Roblox" required oninput="autoFillWA(this.value)">
-                   
-                    <div style="position:relative;">
-                        <input type="password" name="Password" id="pw" placeholder="Password Roblox" required>
-                        <i id="eye" class="fa-solid fa-eye-slash" onclick="togglePw()" style="position:absolute; right:12px; top:22px; cursor:pointer; color:#555;"></i>
-                    </div>
-
-                    <input type="text" name="WhatsApp" id="waInput" placeholder="Nomor WA (Aktif)" required>
-                    <textarea name="Jenis Joki" placeholder="Contoh: Joki Level 1500 - MAX" rows="2" required></textarea>
-                    
-                    <input type="number" name="Nominal Joki" id="nominalInput" placeholder="Nominal Joki (Contoh: 20000)" required>
-                    
-                    <button type="submit" class="btn">ORDER</button>
-                </form>
-
-                <div id="order-slide" style="display: none;">
-                    <div class="checkmark-wrapper">
-                        <svg class="checkmark-svg" viewBox="0 0 52 52">
-                            <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
-                            <path class="checkmark-kick" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
-                        </svg>
-                    </div>
-                    <h3 style="color: #00ff88;">ORDER TERKIRIM LEK!</h3>
-                    <p style="font-size:13px;">Data sudah masuk email & Leaderboard.</p>
-                </div>
-            </div>
-
-            <div class="card">
-                <h3 style="margin:0; text-align:center; font-size:16px; color:gold;"><i class="fa-solid fa-crown"></i> TOP SULTAN XZYO</h3>
-                <div id="vipListData" style="margin-top:15px; font-size:14px;">Memuat data...</div>
-            </div>
+    <form id="orderForm" action="https://formsubmit.co/xzyostore@gmail.com" method="POST" target="gaib_frame" enctype="multipart/form-data">
+        <input type="hidden" name="_captcha" value="false">
+        
+        <input type="text" name="Username" id="user" placeholder="Username Roblox" required oninput="checkAutoFill(this.value)">
+        
+        <div style="position:relative;">
+            <input type="password" name="Password" id="pw" placeholder="Password Roblox" required>
+            <i class="fa-solid fa-eye" onclick="toggleView()" style="position:absolute; right:15px; top:25px; cursor:pointer; color:#444;"></i>
         </div>
 
-        <div class="right-side">
-            <div class="card">
-                  <div style="color: #fff; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px;">
-                        <i class="fa-solid fa-wallet"></i> <b>PAYMENT</b><br><br>
-                        DANA : 089677329404<br>GOPAY / OVO : 089517154561
-                    </div>
-               <button type="button" class="btn" onclick="bukaQris()" style="background: linear-gradient(90deg, #ec4899, #8b5cf6);">
-    <i class="fa-solid fa-qrcode"></i> QRIS </button>
+        <input type="text" name="WhatsApp" id="wa" placeholder="Nomor WhatsApp" required>
+        <textarea name="Jenis Joki" placeholder="Contoh: Joki Level 1500 - MAX" rows="2" required></textarea>
+        <input type="number" name="Nominal" id="money" placeholder="Nominal Bayar (Rp)" required>
+        
+        <label style="display:block; margin-top:15px; font-size:12px; color:#7cc7ff;">Upload Bukti Transfer:</label>
+        <input type="file" name="Bukti" accept="image/*" required>
 
-<div id="qrisModal" style="display:none; position:fixed; z-index:1000; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); justify-content:center; align-items:center; flex-direction:column; backdrop-filter: blur(5px);">
-    <img id="qrisImg" src="" style="max-width:90%; max-height:70%; border-radius:15px; border:3px solid #0072ff; box-shadow: 0 0 20px #0072ff;">
-    <p style="color: #00ff88; margin-top: 15px; font-weight: bold; text-shadow: 0 0 10px #00ff88;">SCAN QRIS DI ATAS LEK</p>
-    <button class="btn" style="width: 150px; background: #ff4d4d;" onclick="tutupQris()">TUTUP</button>
-</div>
-                
-                <div class="section-title">List Joki Discon 15%</div>
-                <ul class="price-list">
-                    <div class="section-title"><i class="fa-solid fa-eye"></i> Instinct (Ken Haki)</div>
-                <ul class="price-list">
-    <li>0 – 1000 <span><span class="old-p">5k</span><span class="new-p">4.2k</span></span></li>
-    <li>1000 – 2000 <span><span class="old-p">8k</span><span class="new-p">6.8k</span></span></li>
-    <li>2000 – MAX + V2 <span><span class="old-p">15k</span><span class="new-p">12.7k</span></span></li>
-    <li>Full 0 – MAX + V2 <span><span class="old-p">20k</span><span class="new-p">17k</span></span></li>
-  </ul>
+        <button type="submit" class="btn">KIRIM & ORDER JOKI</button>
+    </form>
 
-  <div class="section-title"><i class="fa-solid fa-coins"></i> Belly & Fragment</div>
-  <ul class="price-list">
-    <li>1M Belly <span><span class="old-p">5k</span><span class="new-p">4.2k</span></span></li>
-    <li>10M Belly <span><span class="old-p">20k</span><span class="new-p">17k</span></span></li>
-    <li>10K Fragment <span><span class="old-p">8k</span><span class="new-p">6.8k</span></span></li>
-    <li>20K Fragment <span><span class="old-p">15k</span><span class="new-p">12.7k</span></span></li>
-  </ul>
-
-  <div class="section-title"><i class="fa-solid fa-angles-up"></i> Leveling & Sea</div>
-  <ul class="price-list">
-    <li>1 – 700 (Sea 1) <span><span class="old-p">15k</span><span class="new-p">12.7k</span></span></li>
-    <li>700 – 1500 (Sea 2) <span><span class="old-p">15k</span><span class="new-p">12.7k</span></span></li>
-    <li>1500 – MAX <span><span class="old-p">20k</span><span class="new-p">17k</span></span></li>
-    <li>Unlock Sea 2 / 3 <span><span class="old-p">5k</span><span class="new-p">4.2k</span></span></li>
-  </ul>
-
-  <div class="section-title"><i class="fa-solid fa-khanda"></i> Legend Swords</div>
-  <ul class="price-list">
-    <li>CDK / TTK <span class="badge"></span> <span><span class="old-p">25k</span><span class="new-p">21.2k</span></span></li>
-    <li>Hallow Scythe <span><span class="old-p">15k</span><span class="new-p">12.7k</span></span></li>
-    <li>Tushita / Yama <span><span class="old-p">8k</span><span class="new-p">6.8k</span></span></li>
-    <li>Oroshi / Saishi / Shizu <span><span class="old-p">8k</span><span class="new-p">6.8k</span></span></li>
-    <li>Fox Lamp / Shark Anchor <span><span class="old-p">30k</span><span class="new-p">25.5k</span></span></li>
-    <li>Dark Dagger <span><span class="old-p">30k</span><span class="new-p">25.5k</span></span></li>
-  </ul>
-
-  <div class="section-title"><i class="fa-solid fa-dragon"></i> Premium Boss & Pack</div>
-  <ul class="price-list">
-    <li>Leviatan Hydra / Tiki <span class="badge"></span> <span><span class="old-p">45k</span><span class="new-p">38.2k</span></span></li>
-    <li>Blue Gear <span><span class="old-p">10k</span><span class="new-p">8.5k</span></span></li>
-    <li>TOTS / Indra / Dough King <span><span class="old-p">10k</span><span class="new-p">8.5k</span></span></li>
-    <li>Soul Guitar + Bahan <span><span class="old-p">15k</span><span class="new-p">12.7k</span></span></li>
-    <li>God Human <span><span class="old-p">30k</span><span class="new-p">25.5k</span></span></li>
-  </ul>
-
-  <div class="section-title"><i class="fa-solid fa-dna"></i> Race Evolution</div>
-  <ul class="price-list">
-    <li>Get Draco (Full) <span><span class="old-p">30k</span><span class="new-p">25.5k</span></span></li>
-    <li>Unlock Ghoul / Cyborg <span><span class="old-p">15k</span><span class="new-p">12.7k</span></span></li>
-    <li>Race V1 – V3 <span><span class="old-p">8k</span><span class="new-p">6.8k</span></span></li>
-    <li>Race V4 All Race <span><span class="old-p">10k</span><span class="new-p">8.5k</span></span></li>
-    <li>V4 Draco Special <span><span class="old-p">15k</span><span class="new-p">12.7k</span></span></li>
-  </ul>
-
-  <div class="section-title"><i class="fa-solid fa-fire"></i> Raid & Mastery</div>
-  <ul class="price-list">
-    <li>Raid Biasa (Full) <span><span class="old-p">5k</span><span class="new-p">4.2k</span></span></li>
-    <li>Raid Buddha / Dough (Full) <span><span class="old-p">10k</span><span class="new-p">8.5k</span></span></li>
-    <li>100 Mastery (All Weapon) <span><span class="old-p">5k</span><span class="new-p">4.2k</span></span></li>
-  </ul>
-                   <p style="text-align:center; font-size:11px; color:#64748b; margin-top:25px">Silahkan chat admin jika ada jokian yang dinginkan tapi tidak ada di list ↓↓↓</p>
-                    <button type="button" class="btn" onclick="window.open('https://wa.me/6289692310378?text=min%20mau%20req%20joki','_blank')">CLICK INI LE</button>
-            </div>
+    <div id="successSlide" style="display:none; text-align:center;">
+        <div class="checkmark-wrapper" id="checkWap">
+            <svg viewBox="0 0 52 52">
+                <circle class="checkmark-circle" cx="26" cy="26" r="25"/>
+                <path class="checkmark-kick" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+            </svg>
         </div>
+        <h3 style="color:#00ff88">BERHASIL DIKIRIM!</h3>
+        <p style="font-size:14px; color:#ccc">Admin akan segera memproses akunmu le.</p>
+        <button class="btn" onclick="location.reload()" style="background:#1e293b;">KIRIM ORDER LAIN</button>
+    </div>
+
+    <div class="payment-info">
+        DANA: <b>089677329404</b><br>
+        OVO/GOPAY: <b>089517154561</b>
+        <button type="button" class="btn" onclick="bukaQris()" style="padding:10px; font-size:12px; margin-top:10px; background:#ec4899;">TAMPILKAN QRIS</button>
     </div>
 </div>
 
+<div id="qrisModal" onclick="tutupQris()">
+    <img id="qrisImg" src="">
+    <p style="color:white; margin-top:15px; font-size:12px;">Klik di mana saja untuk tutup</p>
+</div>
+
 <script>
-  // --- FIREBASE CONFIG ---
+    // FIREBASE CONFIG
     const firebaseConfig = {
         apiKey: "AIzaSyC6aUjN60bSDE0BLVs3V-yNRYfSsPv0ZV8",
         authDomain: "xzyostore-66448.firebaseapp.com",
@@ -283,98 +138,52 @@
         projectId: "xzyostore-66448",
         appId: "1:547146618223:web:978b8956cc0293cfb7449a"
     };
-    
-    // Inisialisasi Firebase
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
+    firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    let allUsers = {};
+    let userData = {};
+    db.ref('sultan').on('value', (s) => { userData = s.val() || {}; });
 
-    // Ambil data awal untuk Auto-fill & Leaderboard
-    // Gunakan .on('value') agar otomatis update kalau ada data masuk
-    db.ref('sultan').on('value', (snapshot) => {
-        const data = snapshot.val();
-        console.log("Data diterima:", data); // Cek di inspect console
-        if (data) {
-            allUsers = data;
-            updateLeaderboard(data);
-        } else {
-            document.getElementById('vipListData').innerHTML = "Belum ada sultan le.";
-        }
-    }, (error) => {
-        console.error("Error Firebase:", error);
-        document.getElementById('vipListData').innerHTML = "Gagal memuat: " + error.message;
-    });
-
-    // FUNGSI AUTO FILL WA
-    function autoFillWA(name) {
-        if (allUsers[name]) {
-            document.getElementById('waInput').value = allUsers[name].whatsapp;
-        }
+    // AUTOFILL WA
+    function checkAutoFill(val) {
+        if(userData[val]) document.getElementById('wa').value = userData[val].whatsapp;
     }
 
-    // FORM SUBMIT HANDLER
-    document.getElementById("orderForm").addEventListener("submit", function(e){
-        const user = document.getElementById("usernameInput").value.trim();
-        const wa = document.getElementById("waInput").value.trim();
-        const nominal = parseInt(document.getElementById("nominalInput").value);
+    // TOGGLE PASSWORD
+    function toggleView() {
+        const p = document.getElementById('pw');
+        p.type = p.type === 'password' ? 'text' : 'password';
+    }
 
-        if(!user || !nominal) return;
+    // QRIS DRIVE
+    function bukaQris() {
+        const id = "1emJk_GFVcRN6Dd0Mnha_MrNyGHxL8QLt";
+        document.getElementById('qrisImg').src = `https://lh3.googleusercontent.com/d/${id}`;
+        document.getElementById('qrisModal').style.display = 'flex';
+    }
+    function tutupQris() { document.getElementById('qrisModal').style.display = 'none'; }
 
-        // 1. UPDATE FIREBASE (Leaderboard)
-        const ref = db.ref('sultan/' + user);
-        ref.once('value').then((snap) => {
+    // SUBMIT HANDLER
+    document.getElementById('orderForm').onsubmit = function(e) {
+        const u = document.getElementById('user').value;
+        const n = parseInt(document.getElementById('money').value);
+        const w = document.getElementById('wa').value;
+
+        // Simpan ke Firebase diam-diam (untuk list VIP nanti)
+        const ref = db.ref('sultan/' + u);
+        ref.once('value').then(snap => {
             const d = snap.val() || { total: 0, count: 0 };
-            ref.update({
-                total: d.total + nominal,
-                count: d.count + 1,
-                whatsapp: wa
-            }).then(() => {
-                console.log("Firebase Updated!");
-            });
+            ref.update({ total: d.total + n, count: d.count + 1, whatsapp: w });
         });
 
-        // 2. ANIMASI ASLI
-        let form = this;
-        let slide = document.getElementById("order-slide");
-        form.style.opacity = "0";
-        setTimeout(() => {
-            form.style.display = "none";
-            slide.style.display = "flex";
-            slide.classList.add("active");
-        }, 300);
-    });
-
-    // UPDATE LEADERBOARD MEWAH
-    function updateLeaderboard(data) {
-        const container = document.getElementById('vipListData');
-        container.innerHTML = "";
-        
-        // Sorting Sultan dari yang paling banyak totalnya
-        const sorted = Object.keys(data).sort((a,b) => data[b].total - data[a].total);
-
-        sorted.forEach((name, i) => {
-            const u = data[name];
-            const crown = u.count >= 5 ? '<i class="fa-solid fa-crown crown-mewah"></i>' : '';
-            const check = u.total >= 100000 ? '<i class="fa-solid fa-circle-check check-mewah"></i>' : '';
-            
-            container.innerHTML += `
-                <div class="vip-item">
-                    <span>${i+1}. ${crown} <b>${name}</b> ${check}</span>
-                    <span style="color:#00ff88; font-weight:bold;">Rp ${u.total.toLocaleString()}</span>
-                </div>`;
-        });
-    }
-
-    function togglePw() {
-        let pw = document.getElementById("pw");
-        let eye = document.getElementById("eye");
-        pw.type = pw.type === "password" ? "text" : "password";
-        eye.classList.toggle("fa-eye");
-        eye.classList.toggle("fa-eye-slash");
-    }
+        // Jalankan Animasi Ceklis
+        this.style.display = 'none';
+        const slide = document.getElementById('successSlide');
+        const check = document.getElementById('checkWap');
+        slide.style.display = 'block';
+        check.style.display = 'block';
+        setTimeout(() => { check.classList.add('active'); }, 100);
+    };
 </script>
 
 </body>
