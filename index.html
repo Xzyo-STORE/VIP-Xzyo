@@ -3,12 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xzyo Store - Joki Blox Fruit</title>
+    <title>Xzyo Store - Joki</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
     <style>
         :root {
             --primary-blue: #0072ff;
@@ -17,173 +14,120 @@
             --text-white: #ffffff;
         }
 
-        * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
-        
         body {
             background: var(--dark-bg);
             color: var(--text-white);
-            margin: 0;
-            padding: 20px;
+            font-family: 'Segoe UI', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            margin: 0;
         }
 
+        /* CARD JOKI */
         .card { 
             background: var(--card-bg); 
             border: 1px solid rgba(255,255,255,0.1); 
             border-radius: 20px; 
             padding: 30px; 
-            max-width: 450px; 
-            width: 100%;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            max-width: 400px; 
+            width: 90%;
             position: relative;
+            z-index: 1; /* Pastikan di bawah modal */
         }
-
-        h2 { text-align: center; margin: 0; color: var(--primary-blue); letter-spacing: 2px; text-transform: uppercase; }
-        p.subtitle { text-align: center; font-size: 13px; color: #7cc7ff; margin-bottom: 25px; }
 
         input, textarea { 
-            width: 100%; padding: 14px; border-radius: 10px; border: 1px solid #1e293b; 
-            margin-top: 12px; background: #0b1220; color: white; outline: none; transition: 0.3s;
+            width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #1e293b; 
+            margin-top: 10px; background: #0b1220; color: white; outline: none;
         }
-        input:focus { border-color: var(--primary-blue); }
 
         .btn {
-            width: 100%; padding: 15px; border-radius: 12px; border: none; margin-top: 20px;
+            width: 100%; padding: 15px; border-radius: 12px; border: none; margin-top: 15px;
             background: linear-gradient(90deg, #020617, #0b3c8a, #020617);
-            color: white; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 16px;
+            color: white; font-weight: bold; cursor: pointer;
         }
-        .btn:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,114,255,0.4); }
 
-        /* MODAL QRIS */
+        /* --- MODAL QRIS MEWAH --- */
         #qrisModal { 
-            display:none; position:fixed; z-index:100; top:0; left:0; width:100%; height:100%; 
-            background:rgba(0,0,0,0.9); justify-content:center; align-items:center; flex-direction:column; 
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            background: rgba(0, 0, 0, 0.8); /* Gelapkan background */
+            backdrop-filter: blur(8px); /* EFEK BLUR DI BELAKANG */
+            z-index: 9999; /* PALING DEPAN */
+            justify-content: center; 
+            align-items: center; 
+            flex-direction: column;
         }
-        #qrisModal img { max-width: 85%; border-radius: 15px; border: 2px solid var(--primary-blue); }
 
-        /* ANIMASI CEKLIS ASLI */
-        .checkmark-wrapper { width: 100px; height: 100px; margin: 0 auto 20px; display: none; }
-        .checkmark-circle, .checkmark-kick { fill: none; stroke: #00ff88; stroke-linecap: round; stroke-dasharray: 200; stroke-dashoffset: 200; }
-        .active .checkmark-circle { stroke-width: 3; stroke-dasharray: 166; stroke-dashoffset: 166; animation: drawStroke 0.6s forwards; }
-        .active .checkmark-kick { stroke-width: 5; stroke-dasharray: 48; stroke-dashoffset: 48; animation: drawStroke 0.3s 0.6s forwards; }
-        @keyframes drawStroke { 100% { stroke-dashoffset: 0; } }
+        #qrisModal img { 
+            max-width: 80%; 
+            border-radius: 20px; 
+            border: 4px solid var(--primary-blue);
+            box-shadow: 0 0 30px var(--primary-blue);
+            animation: zoomIn 0.3s ease;
+        }
 
-        .payment-info {
-            background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; margin-top: 20px;
-            font-size: 13px; text-align: center; border: 1px dashed #1e293b;
+        @keyframes zoomIn {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .btn-tutup {
+            margin-top: 20px;
+            padding: 10px 30px;
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>XZYO JOKI</h2>
-    <p class="subtitle">Isi data akunmu dengan aman le!</p>
-
-    <iframe name="gaib_frame" style="display:none;"></iframe>
-    
-    <form id="orderForm" action="https://formsubmit.co/xzyostore@gmail.com" method="POST" target="gaib_frame" enctype="multipart/form-data">
-        <input type="hidden" name="_captcha" value="false">
-        
-        <input type="text" name="Username" id="user" placeholder="Username Roblox" required oninput="checkAutoFill(this.value)">
-        
-        <div style="position:relative;">
-            <input type="password" name="Password" id="pw" placeholder="Password Roblox" required>
-            <i class="fa-solid fa-eye" onclick="toggleView()" style="position:absolute; right:15px; top:25px; cursor:pointer; color:#444;"></i>
-        </div>
-
-        <input type="text" name="WhatsApp" id="wa" placeholder="Nomor WhatsApp" required>
-        <textarea name="Jenis Joki" placeholder="Contoh: Joki Level 1500 - MAX" rows="2" required></textarea>
-        <input type="number" name="Nominal" id="money" placeholder="Nominal Bayar (Rp)" required>
-        
-        <label style="display:block; margin-top:15px; font-size:12px; color:#7cc7ff;">Upload Bukti Transfer:</label>
-        <input type="file" name="Bukti" accept="image/*" required>
-
-        <button type="submit" class="btn">KIRIM & ORDER JOKI</button>
+    <h2 style="text-align:center; color:var(--primary-blue)">XZYO JOKI</h2>
+    <form>
+        <input type="text" placeholder="Username Roblox">
+        <input type="password" placeholder="Password">
+        <textarea placeholder="Jenis Joki"></textarea>
+        <button type="button" class="btn">KIRIM ORDER</button>
     </form>
-
-    <div id="successSlide" style="display:none; text-align:center;">
-        <div class="checkmark-wrapper" id="checkWap">
-            <svg viewBox="0 0 52 52">
-                <circle class="checkmark-circle" cx="26" cy="26" r="25"/>
-                <path class="checkmark-kick" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
-            </svg>
-        </div>
-        <h3 style="color:#00ff88">BERHASIL DIKIRIM!</h3>
-        <p style="font-size:14px; color:#ccc">Admin akan segera memproses akunmu le.</p>
-        <button class="btn" onclick="location.reload()" style="background:#1e293b;">KIRIM ORDER LAIN</button>
-    </div>
-
-    <div class="payment-info">
-        DANA: <b>089677329404</b><br>
-        OVO/GOPAY: <b>089517154561</b>
-        <button type="button" class="btn" onclick="bukaQris()" style="padding:10px; font-size:12px; margin-top:10px; background:#ec4899;">TAMPILKAN QRIS</button>
+    
+    <div style="text-align:center; margin-top:20px; border-top:1px solid #222; padding-top:15px;">
+        <p style="font-size:12px;">Payment: DANA / QRIS</p>
+        <button class="btn" style="background: #ec4899;" onclick="bukaQris()">TAMPILKAN QRIS</button>
     </div>
 </div>
 
-<div id="qrisModal" onclick="tutupQris()">
+<div id="qrisModal">
     <img id="qrisImg" src="">
-    <p style="color:white; margin-top:15px; font-size:12px;">Klik di mana saja untuk tutup</p>
+    <button class="btn-tutup" onclick="tutupQris()">TUTUP</button>
 </div>
 
 <script>
-    // FIREBASE CONFIG
-    const firebaseConfig = {
-        apiKey: "AIzaSyC6aUjN60bSDE0BLVs3V-yNRYfSsPv0ZV8",
-        authDomain: "xzyostore-66448.firebaseapp.com",
-        databaseURL: "https://xzyostore-66448-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "xzyostore-66448",
-        appId: "1:547146618223:web:978b8956cc0293cfb7449a"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    let userData = {};
-    db.ref('sultan').on('value', (s) => { userData = s.val() || {}; });
-
-    // AUTOFILL WA
-    function checkAutoFill(val) {
-        if(userData[val]) document.getElementById('wa').value = userData[val].whatsapp;
-    }
-
-    // TOGGLE PASSWORD
-    function toggleView() {
-        const p = document.getElementById('pw');
-        p.type = p.type === 'password' ? 'text' : 'password';
-    }
-
-    // QRIS DRIVE
     function bukaQris() {
-        const id = "1emJk_GFVcRN6Dd0Mnha_MrNyGHxL8QLt";
-        document.getElementById('qrisImg').src = `https://lh3.googleusercontent.com/d/${id}`;
+        const driveId = "1emJk_GFVcRN6Dd0Mnha_MrNyGHxL8QLt";
+        // Gunakan link thumbnail drive biar auto muncul
+        document.getElementById('qrisImg').src = `https://lh3.googleusercontent.com/d/${driveId}`;
         document.getElementById('qrisModal').style.display = 'flex';
     }
-    function tutupQris() { document.getElementById('qrisModal').style.display = 'none'; }
 
-    // SUBMIT HANDLER
-    document.getElementById('orderForm').onsubmit = function(e) {
-        const u = document.getElementById('user').value;
-        const n = parseInt(document.getElementById('money').value);
-        const w = document.getElementById('wa').value;
+    function tutupQris() {
+        document.getElementById('qrisModal').style.display = 'none';
+    }
 
-        // Simpan ke Firebase diam-diam (untuk list VIP nanti)
-        const ref = db.ref('sultan/' + u);
-        ref.once('value').then(snap => {
-            const d = snap.val() || { total: 0, count: 0 };
-            ref.update({ total: d.total + n, count: d.count + 1, whatsapp: w });
-        });
-
-        // Jalankan Animasi Ceklis
-        this.style.display = 'none';
-        const slide = document.getElementById('successSlide');
-        const check = document.getElementById('checkWap');
-        slide.style.display = 'block';
-        check.style.display = 'block';
-        setTimeout(() => { check.classList.add('active'); }, 100);
-    };
+    // Klik background hitam buat tutup juga bisa le
+    window.onclick = function(event) {
+        let modal = document.getElementById('qrisModal');
+        if (event.target == modal) {
+            tutupQris();
+        }
+    }
 </script>
 
 </body>
